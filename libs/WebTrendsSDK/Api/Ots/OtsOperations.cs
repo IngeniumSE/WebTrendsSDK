@@ -18,8 +18,7 @@ partial class WebTrendsApiClient
 	{
 		get
 		{
-			return (_ots ??= Defer<IOtsOperations>(
-		c => new OtsOperations(new("/ots/api/rest-1.2"), c))).Value;
+			return (_ots ??= Defer<IOtsOperations>(c => new OtsOperations(new("/ots/api/rest-1.2"), c))).Value;
 		}
 	}
 }
@@ -32,9 +31,8 @@ public partial interface IOtsOperations
 
 }
 
-public partial class OtsOperations(
-	PathString path,
-	ApiClient client) : IOtsOperations
+public partial class OtsOperations(PathString path, ApiClient client) : IOtsOperations
 {
-
+	readonly PathString _path = path;
+	readonly ApiClient _client = client;
 }

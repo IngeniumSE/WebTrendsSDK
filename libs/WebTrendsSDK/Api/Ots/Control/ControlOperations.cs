@@ -14,7 +14,9 @@ partial interface IOtsOperations
 partial class OtsOperations
 {
 	Lazy<IControlOperations> _control;
-	public IControlOperations Control => (_control ??= client.Defer<IControlOperations>(c => new ControlOperations(path + "/control", c))).Value;
+	public IControlOperations Control
+		=> (_control ??= _client.Defer<IControlOperations>(
+					c => new ControlOperations(_path + "/control", c))).Value;
 }
 
 public interface IControlOperations
@@ -26,12 +28,14 @@ public interface IControlOperations
 	/// <param name="projectAlias">The project alias.</param>
 	/// <param name="websiteUrl">The website URL.</param>
 	/// <param name="userAgent">The user agent.</param>
+	/// <param name="state">The state identity, which controls which tests apply. Default is <see cref="State.Normal"/></param>
 	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns>The WebTrends response.</returns>
 	Task<WebTrendsResponse<Project>> GetProjectAsync(
 		string projectAlias,
 		string? websiteUrl = null,
 		string? userAgent = null,
+		State? state = null,
 		CancellationToken cancellationToken = default);
 
 	/// <summary>
@@ -44,50 +48,58 @@ public interface IControlOperations
 	Task<WebTrendsResponse<Project[]>> GetProjectsAsync(
 		string? websiteUrl = null,
 		string? userAgent = null,
+		State? state = State.Normal,
 		CancellationToken cancellationToken = default);
 }
 
 public class ControlOperations(PathString path, ApiClient client) : IControlOperations
 {
+	readonly PathString _path = path;
+	readonly ApiClient _client = client;
+
 	public async Task<WebTrendsResponse<Project>> GetProjectAsync(
 		string projectAlias,
 		string? websiteUrl = null,
 		string? userAgent = null,
+		State? state = null,
 		CancellationToken cancellationToken = default)
 	{
 		Ensure.IsNotNullOrEmpty(projectAlias, nameof(projectAlias));
 
-		var operationPath = path + $"/{client.Settings.AccountId}-{projectAlias}";
+		var operationPath = _path + $"/{_client.Settings.AccountId}-{projectAlias}";
 
 		var request = new WebTrendsRequest<OtsRequest>(
 			HttpMethod.Post,
 			operationPath,
-			CreateOtsRequest(websiteUrl),
-			BuildQuery(client.Settings),
+			CreateOtsRequest(websiteUrl, state),
+			BuildQuery(_client.Settings),
 			userAgent);
 
-		return await client.FetchSingleAsync<OtsRequest, Project, ProjectBody>(request, cancellationToken).ConfigureAwait(false);
+		return await _client.FetchSingleAsync<OtsRequest, Project, ProjectBody>(request, cancellationToken).ConfigureAwait(false);
 	}
 
 	public async Task<WebTrendsResponse<Project[]>> GetProjectsAsync(
 		string? websiteUrl = null,
 		string? userAgent = null,
+		State? state = null,
 		CancellationToken cancellationToken = default)
 	{
-		var operationPath = path + $"/{client.Settings.AccountId}";
+		var operationPath = _path + $"/{_client.Settings.AccountId}";
 
 		var request = new WebTrendsRequest<OtsRequest>(
 			HttpMethod.Post,
 			operationPath,
-			CreateOtsRequest(websiteUrl),
-			BuildQuery(client.Settings),
+			CreateOtsRequest(websiteUrl, state),
+			BuildQuery(_client.Settings),
 			userAgent);
 
-		return await client.FetchManyAsync<OtsRequest, Project, ProjectBody>(request, cancellationToken).ConfigureAwait(false);
+		return await _client.FetchManyAsync<OtsRequest, Project, ProjectBody>(request, cancellationToken).ConfigureAwait(false);
 	}
 
-	OtsRequest CreateOtsRequest(string? websiteUrl)
-		=> new OtsRequest(websiteUrl is { Length: > 0 } ? websiteUrl : client.Settings.WebsiteUrl);
+	OtsRequest CreateOtsRequest(string? websiteUrl, State? state)
+		=> new OtsRequest(
+				websiteUrl is { Length: > 0 } ? websiteUrl : _client.Settings.WebsiteUrl,
+				state.GetValueOrDefault(_client.Settings.State).ToString().ToLower());
 
 	QueryString BuildQuery(WebTrendsSettings settings)
 		=> new QueryStringBuilder()

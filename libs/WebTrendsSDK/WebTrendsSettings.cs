@@ -50,6 +50,11 @@ public class WebTrendsSettings
 	public string OtsBaseUrl { get; set; } = "https://ots.webtrends-optimize.com";
 
 	/// <summary>
+	/// Gets or sets the default state for the WebTrends API.
+	/// </summary>
+	public State State { get; set; } = State.Normal;
+
+	/// <summary>
 	/// Gets or sets whether to track the returned content as a View in WebTrends.
 	/// </summary>
 	public bool Track { get; set; } = true;

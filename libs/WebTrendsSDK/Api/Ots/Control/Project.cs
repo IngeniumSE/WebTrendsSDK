@@ -1,6 +1,8 @@
 ﻿// This work is licensed under the terms of the MIT license.
 // For a copy, see <https://opensource.org/licenses/MIT>.
 
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
 using WebTrendsSDK.Api;
@@ -38,4 +40,10 @@ public class ProjectFactor
 
 	[JsonPropertyName("value")]
 	public string? Value { get; set; }
+}
+
+public enum State
+{
+	Normal,
+	Staging
 }

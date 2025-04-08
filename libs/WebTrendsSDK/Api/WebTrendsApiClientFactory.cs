@@ -15,12 +15,10 @@ public interface IWebTrendsApiClientFactory
 	IWebTrendsApiClient CreateApiClient(WebTrendsSettings settings);
 }
 
-public class WebTrendsApiClientFactory : IWebTrendsApiClientFactory
+public class WebTrendsApiClientFactory(IWebTrendsHttpClientFactory httpClientFactory) : IWebTrendsApiClientFactory
 {
-	readonly IWebTrendsHttpClientFactory _httpClientFactory;
-
-	public WebTrendsApiClientFactory(IWebTrendsHttpClientFactory httpClientFactory) =>
-		_httpClientFactory = Ensure.IsNotNull(httpClientFactory, nameof(httpClientFactory));
+	readonly IWebTrendsHttpClientFactory _httpClientFactory
+		= Ensure.IsNotNull(httpClientFactory, nameof(httpClientFactory));
 
 	public IWebTrendsApiClient CreateApiClient(WebTrendsSettings settings)
 	{

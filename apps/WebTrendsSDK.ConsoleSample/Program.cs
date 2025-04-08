@@ -14,7 +14,7 @@ var api = new WebTrendsApiClient(http, settings);
 
 const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0";
 
-var project = await api.Ots.Control.GetProjectAsync("ta_YieldManagement", userAgent: UserAgent);
+var project = await api.Ots.Control.GetProjectAsync("ta_1614ReducedCheckout", userAgent: UserAgent);
 
 var projects = await api.Ots.Control.GetProjectsAsync(userAgent: UserAgent);
 

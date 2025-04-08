@@ -8,8 +8,6 @@ public partial interface IWebTrendsApiClient
 
 }
 
-public partial class WebTrendsApiClient : ApiClient, IWebTrendsApiClient
-{
-	public WebTrendsApiClient(HttpClient http, WebTrendsSettings settings)
-		: base(http, settings) { }
-}
+public partial class WebTrendsApiClient(HttpClient http, WebTrendsSettings settings)
+	: ApiClient(http, settings), IWebTrendsApiClient
+{ }
